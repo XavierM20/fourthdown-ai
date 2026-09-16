@@ -697,6 +697,6 @@ The project demonstrates:
 
 **Xavier Mathews**
 
-Computer Science / Software Engineering
+Software Engineer
 
 FourthDown AI was built as a portfolio project demonstrating full-stack engineering, backend systems, data engineering, and applied machine learning.
