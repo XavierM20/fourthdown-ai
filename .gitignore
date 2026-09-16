@@ -1,0 +1,40 @@
+# Environment / Secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IDEs
+.idea/
+**/.idea/
+.vscode/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Backend
+backend/target/
+
+# Python / ML
+ml/.venv/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs
+*.log
+# ML development artifacts
+ml/models/*_backup.joblib
+ml/models/*_candidate.joblib
+ml/models/*_backup.json
+ml/models/*_candidate.json
+
+# Frontend local environment
+frontend/.env.development
+frontend/.env.production

@@ -1,0 +1,415 @@
+### =========================================================
+### FOURTHDOWN AI - API TEST REQUESTS
+### =========================================================
+
+
+### ---------------------------------------------------------
+### HEALTH
+### ---------------------------------------------------------
+
+### Check backend health
+GET http://localhost:8080/api/v1/health
+
+
+
+### ---------------------------------------------------------
+### TEAMS
+### ---------------------------------------------------------
+
+### Get all teams
+GET http://localhost:8080/api/v1/teams
+
+
+### Get Alabama
+GET http://localhost:8080/api/v1/teams/1
+
+
+### Get Georgia
+GET http://localhost:8080/api/v1/teams/2
+
+
+### Create Alabama
+### Only run this if Alabama does NOT already exist
+POST http://localhost:8080/api/v1/teams
+Content-Type: application/json
+
+{
+  "name": "Alabama",
+  "abbreviation": "ALA",
+  "conference": "SEC",
+  "city": "Tuscaloosa",
+  "state": "Alabama",
+  "logoUrl": "https://a.espncdn.com/i/teamlogos/ncaa/500/333.png"
+}
+
+
+### Create Georgia
+### Only run this if Georgia does NOT already exist
+POST http://localhost:8080/api/v1/teams
+Content-Type: application/json
+
+{
+  "name": "Georgia",
+  "abbreviation": "UGA",
+  "conference": "SEC",
+  "city": "Athens",
+  "state": "Georgia",
+  "logoUrl": "https://a.espncdn.com/i/teamlogos/ncaa/500/61.png"
+}
+
+
+### Create Texas
+POST http://localhost:8080/api/v1/teams
+Content-Type: application/json
+
+{
+  "name": "Texas",
+  "abbreviation": "TEX",
+  "conference": "SEC",
+  "city": "Austin",
+  "state": "Texas",
+  "logoUrl": "https://a.espncdn.com/i/teamlogos/ncaa/500/251.png"
+}
+
+
+### Create Ohio State
+POST http://localhost:8080/api/v1/teams
+Content-Type: application/json
+
+{
+  "name": "Ohio State",
+  "abbreviation": "OSU",
+  "conference": "Big Ten",
+  "city": "Columbus",
+  "state": "Ohio",
+  "logoUrl": "https://a.espncdn.com/i/teamlogos/ncaa/500/194.png"
+}
+
+
+### Create Oregon
+POST http://localhost:8080/api/v1/teams
+Content-Type: application/json
+
+{
+  "name": "Oregon",
+  "abbreviation": "ORE",
+  "conference": "Big Ten",
+  "city": "Eugene",
+  "state": "Oregon",
+  "logoUrl": "https://a.espncdn.com/i/teamlogos/ncaa/500/2483.png"
+}
+
+
+### Create Penn State
+POST http://localhost:8080/api/v1/teams
+Content-Type: application/json
+
+{
+  "name": "Penn State",
+  "abbreviation": "PSU",
+  "conference": "Big Ten",
+  "city": "University Park",
+  "state": "Pennsylvania",
+  "logoUrl": "https://a.espncdn.com/i/teamlogos/ncaa/500/213.png"
+}
+
+
+### ---------------------------------------------------------
+### GAMES
+### ---------------------------------------------------------
+
+### Get all games
+GET http://localhost:8080/api/v1/games
+
+
+### Get Game 1
+GET http://localhost:8080/api/v1/games/1
+
+
+### Create Alabama vs Georgia
+### DO NOT run this again if Game 1 already exists
+POST http://localhost:8080/api/v1/games
+Content-Type: application/json
+
+{
+  "homeTeam": {
+    "id": 1
+  },
+  "awayTeam": {
+    "id": 2
+  },
+  "gameDate": "2026-09-19T19:30:00",
+  "status": "SCHEDULED",
+  "homeScore": null,
+  "awayScore": null,
+  "venue": "Bryant-Denny Stadium"
+}
+
+
+### Texas vs Georgia
+POST http://localhost:8080/api/v1/games
+Content-Type: application/json
+
+{
+  "homeTeam": {
+    "id": 2
+  },
+  "awayTeam": {
+    "id": 5
+  },
+  "gameDate": "2026-09-26T19:00:00",
+  "status": "SCHEDULED",
+  "homeScore": null,
+  "awayScore": null,
+  "venue": "Sanford Stadium"
+}
+
+
+### Oregon vs Ohio State
+POST http://localhost:8080/api/v1/games
+Content-Type: application/json
+
+{
+  "homeTeam": {
+    "id": 6
+  },
+  "awayTeam": {
+    "id": 7
+  },
+  "gameDate": "2026-10-03T19:30:00",
+  "status": "SCHEDULED",
+  "homeScore": null,
+  "awayScore": null,
+  "venue": "Ohio Stadium"
+}
+
+
+### Penn State vs Oregon
+POST http://localhost:8080/api/v1/games
+Content-Type: application/json
+
+{
+  "homeTeam": {
+    "id": 7
+  },
+  "awayTeam": {
+    "id": 8
+  },
+  "gameDate": "2026-10-10T15:30:00",
+  "status": "SCHEDULED",
+  "homeScore": null,
+  "awayScore": null,
+  "venue": "Autzen Stadium"
+}
+
+### ---------------------------------------------------------
+### TEAM GAME STATS
+### ---------------------------------------------------------
+
+### Get all team game stats
+GET http://localhost:8080/api/v1/stats
+
+
+### Get stats for Game 1
+GET http://localhost:8080/api/v1/stats/game/1
+
+
+### Get Alabama stats
+GET http://localhost:8080/api/v1/stats/team/1
+
+
+### Get Georgia stats
+GET http://localhost:8080/api/v1/stats/team/2
+
+
+### Create Alabama stats for Game 1
+### Only run if these stats do NOT already exist
+POST http://localhost:8080/api/v1/stats
+Content-Type: application/json
+
+{
+  "game": {
+    "id": 1
+  },
+  "team": {
+    "id": 1
+  },
+  "points": 31,
+  "totalYards": 421,
+  "passingYards": 267,
+  "rushingYards": 154,
+  "turnovers": 1,
+  "firstDowns": 23,
+  "thirdDownAttempts": 12,
+  "thirdDownConversions": 7,
+  "redZoneAttempts": 4,
+  "redZoneScores": 4,
+  "penalties": 6,
+  "penaltyYards": 52
+}
+
+
+### Create Georgia stats for Game 1
+### Only run if these stats do NOT already exist
+POST http://localhost:8080/api/v1/stats
+Content-Type: application/json
+
+{
+  "game": {
+    "id": 1
+  },
+  "team": {
+    "id": 2
+  },
+  "points": 24,
+  "totalYards": 376,
+  "passingYards": 242,
+  "rushingYards": 134,
+  "turnovers": 2,
+  "firstDowns": 20,
+  "thirdDownAttempts": 13,
+  "thirdDownConversions": 5,
+  "redZoneAttempts": 4,
+  "redZoneScores": 3,
+  "penalties": 8,
+  "penaltyYards": 71
+}
+
+
+
+### ---------------------------------------------------------
+### TEAM ANALYTICS
+### ---------------------------------------------------------
+
+### Get Alabama analytics
+GET http://localhost:8080/api/v1/analytics/teams/1
+
+
+### Get Georgia analytics
+GET http://localhost:8080/api/v1/analytics/teams/2
+
+### Compare Alabama and Georgia
+GET http://localhost:8080/api/v1/analytics/compare?team1=1&team2=2
+
+### Invalid comparison
+GET http://localhost:8080/api/v1/analytics/compare?team1=1&team2=1
+
+
+### ---------------------------------------------------------
+### DASHBOARD
+### ---------------------------------------------------------
+
+### Get dashboard data
+GET http://localhost:8080/api/v1/dashboard
+
+
+### Test CFBD endpoint
+GET http://localhost:8080/api/v1/cfbd/games?year=2026&team=Alabama
+
+
+### =========================================================
+### REAL CFBD IMPORT
+### =========================================================
+
+### Import / synchronize real 2026 FBS games
+POST http://localhost:8080/api/v1/import/season/2026
+
+### Get real CFBD team game stats
+GET http://localhost:8080/api/v1/cfbd/team-stats?year=2026&week=1
+
+### Get Alabama real game stats
+GET http://localhost:8080/api/v1/cfbd/team-stats/team?year=2026&team=Alabama
+
+### Import FBS team metadata
+POST http://localhost:8080/api/v1/import/teams/fbs/2026
+
+
+### Import FCS team metadata
+POST http://localhost:8080/api/v1/import/teams/fcs/2026
+
+
+### Import FBS games
+POST http://localhost:8080/api/v1/import/season/fbs/2026
+
+
+### Import FCS games
+POST http://localhost:8080/api/v1/import/season/fcs/2026
+
+### Get all teams
+GET http://localhost:8080/api/v1/teams
+
+
+### Get to check
+GET http://localhost:8080/api/v1/analytics/teams/1
+### Import FBS season stats
+POST http://localhost:8080/api/v1/import/stats/season/fbs/2026
+
+
+### Import FCS season stats
+POST http://localhost:8080/api/v1/import/stats/season/fcs/2026
+
+### FourthDown AI matchup prediction
+GET http://localhost:8080/api/v1/predictions/matchup?homeTeamId=1&awayTeamId=2
+
+### =========================
+### 2023
+### =========================
+
+POST http://localhost:8080/api/v1/import/teams/fbs/2023
+
+###
+POST http://localhost:8080/api/v1/import/teams/fcs/2023
+###
+POST http://localhost:8080/api/v1/import/season/fbs/2023
+###
+POST http://localhost:8080/api/v1/import/season/fcs/2023
+###
+POST http://localhost:8080/api/v1/import/stats/season/fbs/2023
+###
+POST http://localhost:8080/api/v1/import/stats/season/fcs/2023
+
+
+### =========================
+### 2024
+### =========================
+
+POST http://localhost:8080/api/v1/import/teams/fbs/2024
+###
+POST http://localhost:8080/api/v1/import/teams/fcs/2024
+###
+POST http://localhost:8080/api/v1/import/season/fbs/2024
+###
+POST http://localhost:8080/api/v1/import/season/fcs/2024
+###
+POST http://localhost:8080/api/v1/import/stats/season/fbs/2024
+###
+POST http://localhost:8080/api/v1/import/stats/season/fcs/2024
+
+
+### =========================
+### 2025
+### =========================
+
+POST http://localhost:8080/api/v1/import/teams/fbs/2025
+###
+POST http://localhost:8080/api/v1/import/teams/fcs/2025
+###
+POST http://localhost:8080/api/v1/import/season/fbs/2025
+###
+POST http://localhost:8080/api/v1/import/season/fcs/2025
+###
+POST http://localhost:8080/api/v1/import/stats/season/fbs/2025
+###
+POST http://localhost:8080/api/v1/import/stats/season/fcs/2025
+
+###
+GET http://localhost:8080/api/v1/ml/training-data?startSeason=2023&endSeason=2025&minPriorGames=3
+
+###
+GET http://localhost:8080/api/v1/predictions/matchup?homeTeamId=1&awayTeamId=2
+
+###
+GET http://localhost:8080/api/v1/predictions/game/130
+
+###
+

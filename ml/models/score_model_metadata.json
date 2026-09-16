@@ -1,0 +1,59 @@
+{
+    "modelName": "Ridge Regression",
+    "status": "production",
+    "generatedAtUtc": "2026-09-15T03:57:45.490767+00:00",
+    "features": [
+        "pointsDifference",
+        "yardsDifference",
+        "turnoverDifference",
+        "scoringMarginDifference",
+        "thirdDownDifference",
+        "redZoneDifference",
+        "recentFormDifference",
+        "opponentWinRateDifference",
+        "opponentScoringMarginDifference"
+    ],
+    "featureCount": 9,
+    "targets": [
+        "scoreMargin",
+        "totalPoints"
+    ],
+    "evaluationTrainingSeasons": [
+        2023,
+        2024
+    ],
+    "testSeason": 2025,
+    "deploymentTrainingSeasons": [
+        2023,
+        2024,
+        2025
+    ],
+    "evaluationTrainingExamples": 2749,
+    "testingExamples": 1631,
+    "deploymentTrainingExamples": 4380,
+    "totalExamples": 4380,
+    "metrics": {
+        "marginMae": 13.866133932542859,
+        "marginRmse": 17.763156972076377,
+        "totalPointsMae": 13.20908869084037,
+        "homeScoreMae": 10.22299545017359,
+        "awayScoreMae": 9.237196204166906,
+        "combinedScoreMae": 9.73009582717025
+    },
+    "ridgeRegression": {
+        "marginMae": 13.866133932542859,
+        "marginRmse": 17.763156972076377,
+        "totalPointsMae": 13.20908869084037,
+        "homeScoreMae": 10.22299545017359,
+        "awayScoreMae": 9.237196204166906,
+        "combinedScoreMae": 9.73009582717025
+    },
+    "randomForestRegressor": {
+        "marginMae": 14.199617403049482,
+        "marginRmse": 18.11333580980826,
+        "totalPointsMae": 13.451949834744987,
+        "homeScoreMae": 10.514296437826694,
+        "awayScoreMae": 9.402001495062699,
+        "combinedScoreMae": 9.958148966444696
+    }
+}

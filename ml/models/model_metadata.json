@@ -1,0 +1,51 @@
+{
+    "modelName": "Logistic Regression",
+    "status": "production",
+    "generatedAtUtc": "2026-09-15T03:57:16.415290+00:00",
+    "features": [
+        "pointsDifference",
+        "yardsDifference",
+        "turnoverDifference",
+        "scoringMarginDifference",
+        "thirdDownDifference",
+        "redZoneDifference",
+        "recentFormDifference",
+        "opponentWinRateDifference",
+        "opponentScoringMarginDifference"
+    ],
+    "featureCount": 9,
+    "evaluationTrainingSeasons": [
+        2023,
+        2024
+    ],
+    "testSeason": 2025,
+    "deploymentTrainingSeasons": [
+        2023,
+        2024,
+        2025
+    ],
+    "evaluationTrainingExamples": 2749,
+    "testingExamples": 1631,
+    "deploymentTrainingExamples": 4380,
+    "totalExamples": 4380,
+    "accuracy": 0.7296137339055794,
+    "rocAuc": 0.7967784621535942,
+    "logLoss": 0.5290830487343413,
+    "logisticRegression": {
+        "accuracy": 0.7296137339055794,
+        "rocAuc": 0.7967784621535942,
+        "logLoss": 0.5290830487343413
+    },
+    "randomForest": {
+        "accuracy": 0.7155119558553035,
+        "rocAuc": 0.785911483868511,
+        "logLoss": 0.5507101877564169
+    },
+    "featureEngineering": {
+        "seasonAware": true,
+        "kickoffCutoff": true,
+        "priorSeasonFallback": true,
+        "currentSeasonFullWeightAfterGames": 4,
+        "opponentStrength": true
+    }
+}
