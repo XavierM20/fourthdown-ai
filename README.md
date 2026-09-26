@@ -26,70 +26,47 @@
   <a href="#-roadmap">Roadmap</a>
 </p>
 
-Overview
+---
 
-FourthDown AI is an end-to-end college football analytics application built to explore teams, games, rankings, historical performance, and matchup predictions across FBS and FCS football.
+## Overview
+
+**FourthDown AI** is an end-to-end college football analytics application built to explore teams, games, rankings, historical performance, and matchup predictions across FBS and FCS football.
 
 The project combines a modern React frontend with a Spring Boot API, PostgreSQL, and a dedicated FastAPI machine-learning service. Real college football data is imported from CollegeFootballData (CFBD), transformed into pregame features, and used by trained models to estimate win probability and projected scores.
 
-Why this project exists
+### Why this project exists
 
 FourthDown AI was built as a portfolio project to demonstrate practical full-stack and applied machine-learning engineering in one system:
 
-third-party sports-data ingestion
+- third-party sports-data ingestion
+- relational database design
+- REST API development
+- feature engineering and leakage prevention
+- model training and evaluation
+- Java-to-Python service integration
+- interactive data visualization
+- production-oriented environment configuration
+- Docker-based local infrastructure
 
-relational database design
+---
 
-REST API development
+## ✨ Features
 
-feature engineering and leakage prevention
+| Area | What it does |
+|---|---|
+| **Dashboard** | Shows team/game counts, upcoming games, and production model performance |
+| **Teams** | Browse FBS/FCS teams, season records, analytics, rankings, and ranking history |
+| **Games** | Explore regular-season, bowl, and playoff games with scores and metadata |
+| **Rankings** | View AP, CFP, and FCS poll data with weekly movement and history |
+| **Analytics** | Compare scoring, yardage, turnovers, third downs, red-zone efficiency, and form |
+| **Predictions** | Generate matchup win probabilities and projected scores |
+| **ML Monitoring** | Surface model metadata and holdout evaluation metrics inside the app |
 
-model training and evaluation
+---
 
-Java-to-Python service integration
+## 🧭 Application Flow
 
-interactive data visualization
-
-production-oriented environment configuration
-
-Docker-based local infrastructure
-
-✨ Features
-
-Area
-
-What it does
-
-Dashboard
-
-Shows team/game counts, upcoming games, and production model performance
-
-Teams
-
-Browse FBS/FCS teams, season records, analytics, rankings, and ranking history
-
-Games
-
-Explore regular-season, bowl, and playoff games with scores and metadata
-
-Rankings
-
-View AP, CFP, and FCS poll data with weekly movement and history
-
-Analytics
-
-Compare scoring, yardage, turnovers, third downs, red-zone efficiency, and form
-
-Predictions
-
-Generate matchup win probabilities and projected scores
-
-ML Monitoring
-
-Surface model metadata and holdout evaluation metrics inside the app
-
-🧭 Application Flow
-
+```mermaid
 flowchart LR
     A[React + TypeScript] -->|REST API| B[Spring Boot]
     B --> C[(PostgreSQL)]
@@ -97,21 +74,29 @@ flowchart LR
     D --> E[Logistic Regression]
     D --> F[Ridge Regression]
     G[CollegeFootballData API] --> B
+```
 
 For normal application requests:
 
+```text
 Browser → React → Spring Boot → PostgreSQL
+```
 
 For a prediction:
 
+```text
 Browser → React → Spring Boot
                        ├── PostgreSQL historical/team data
                        └── FastAPI → trained ML models
+```
 
-The frontend does not call the Python ML service directly. Spring Boot is the public backend API and coordinates database access and ML inference.
+The frontend does **not** call the Python ML service directly. Spring Boot is the public backend API and coordinates database access and ML inference.
 
-🧱 Architecture
+---
 
+## 🧱 Architecture
+
+```text
 fourthdown-ai/
 ├── frontend/                  React + TypeScript + Vite
 │   ├── src/api/               API clients
@@ -137,292 +122,197 @@ fourthdown-ai/
 ├── docker-compose.yml         PostgreSQL local environment
 ├── start-dev.sh               One-command local startup
 └── README.md
+```
 
-🛠 Tech Stack
+---
 
-Frontend
+## 🛠 Tech Stack
 
-React
+### Frontend
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Router
+- TanStack Query
+- Recharts
+- Lucide React
 
-TypeScript
+### Backend
+- Java 21
+- Spring Boot 4
+- Spring Web MVC
+- Spring Data JPA
+- Bean Validation
+- Spring Boot Actuator
+- Maven
 
-Vite
+### Machine Learning
+- Python
+- FastAPI
+- Uvicorn
+- pandas
+- NumPy
+- scikit-learn
+- joblib
 
-Tailwind CSS
+### Infrastructure / Data
+- PostgreSQL 16
+- Docker + Docker Compose
+- CollegeFootballData (CFBD)
 
-React Router
+---
 
-TanStack Query
-
-Recharts
-
-Lucide React
-
-Backend
-
-Java 21
-
-Spring Boot 4
-
-Spring Web MVC
-
-Spring Data JPA
-
-Bean Validation
-
-Spring Boot Actuator
-
-Maven
-
-Machine Learning
-
-Python
-
-FastAPI
-
-Uvicorn
-
-pandas
-
-NumPy
-
-scikit-learn
-
-joblib
-
-Infrastructure / Data
-
-PostgreSQL 16
-
-Docker + Docker Compose
-
-CollegeFootballData (CFBD)
-
-🤖 Machine Learning
+## 🤖 Machine Learning
 
 FourthDown AI uses two production models.
 
-Winner prediction
+### Winner prediction
 
-Algorithm: Logistic Regression
+**Algorithm:** Logistic Regression
 
-Metric
+| Metric | Holdout Result |
+|---|---:|
+| Accuracy | **72.96%** |
+| ROC-AUC | **0.7968** |
+| Log Loss | **0.5291** |
 
-Holdout Result
+### Score prediction
 
-Accuracy
+**Algorithm:** Ridge Regression
 
-72.96%
+| Metric | Holdout Result |
+|---|---:|
+| Combined Team Score MAE | **9.73** |
+| Margin MAE | **13.87** |
+| Margin RMSE | **17.76** |
+| Total Points MAE | **13.21** |
+| Home Score MAE | **10.22** |
+| Away Score MAE | **9.24** |
 
-ROC-AUC
-
-0.7968
-
-Log Loss
-
-0.5291
-
-Score prediction
-
-Algorithm: Ridge Regression
-
-Metric
-
-Holdout Result
-
-Combined Team Score MAE
-
-9.73
-
-Margin MAE
-
-13.87
-
-Margin RMSE
-
-17.76
-
-Total Points MAE
-
-13.21
-
-Home Score MAE
-
-10.22
-
-Away Score MAE
-
-9.24
-
-Evaluation strategy
+### Evaluation strategy
 
 The winner and score models were evaluated using a season-based holdout:
 
+```text
 Evaluation training seasons: 2023 + 2024
 Holdout season:             2025
 Training examples:          2,749
 Testing examples:           1,631
 Total examples:             4,380
+```
 
 After evaluation, the production models are refit using the complete 2023–2025 dataset.
 
-Engineered features
+### Engineered features
 
 The production feature vector contains nine home-vs-away differences:
 
-Points
+1. Points
+2. Total yards
+3. Turnovers
+4. Scoring margin
+5. Third-down efficiency
+6. Red-zone efficiency
+7. Recent form
+8. Opponent win rate
+9. Opponent scoring margin
 
-Total yards
+### Leakage prevention
 
-Turnovers
+Pregame features are calculated using information available **before kickoff** of the game being predicted. Future-game data is excluded from each historical training example.
 
-Scoring margin
-
-Third-down efficiency
-
-Red-zone efficiency
-
-Recent form
-
-Opponent win rate
-
-Opponent scoring margin
-
-Leakage prevention
-
-Pregame features are calculated using information available before kickoff of the game being predicted. Future-game data is excluded from each historical training example.
-
-Early-season fallback
+### Early-season fallback
 
 When a team has limited current-season data, prior-season information is blended in:
 
-Current-season games
+| Current-season games | Current season | Prior season |
+|---:|---:|---:|
+| 0 | 0% | 100% |
+| 1 | 25% | 75% |
+| 2 | 50% | 50% |
+| 3 | 75% | 25% |
+| 4+ | 100% | 0% |
 
-Current season
+---
 
-Prior season
-
-0
-
-0%
-
-100%
-
-1
-
-25%
-
-75%
-
-2
-
-50%
-
-50%
-
-3
-
-75%
-
-25%
-
-4+
-
-100%
-
-0%
-
-🏆 Rankings
+## 🏆 Rankings
 
 FourthDown AI supports weekly ranking data and ranking-history visualization.
 
-FBS
+### FBS
+- AP Top 25 before College Football Playoff rankings become available
+- College Football Playoff rankings once available
 
-AP Top 25 before College Football Playoff rankings become available
-
-College Football Playoff rankings once available
-
-FCS
-
-FCS Coaches Poll
+### FCS
+- FCS Coaches Poll
 
 Ranking views support:
 
-current rank
+- current rank
+- previous rank
+- movement between weeks
+- first-place votes
+- poll points
+- weekly ranking history
+- ranked/unranked transitions
+- season and classification selection
 
-previous rank
+---
 
-movement between weeks
-
-first-place votes
-
-poll points
-
-weekly ranking history
-
-ranked/unranked transitions
-
-season and classification selection
-
-📥 Data Import
+## 📥 Data Import
 
 The backend imports real college football data from CFBD.
 
 Supported data includes:
 
-FBS teams
-
-FCS teams
-
-games
-
-regular season
-
-postseason bowls
-
-playoff rounds
-
-team game statistics
-
-season records
-
-rankings
+- FBS teams
+- FCS teams
+- games
+- regular season
+- postseason bowls
+- playoff rounds
+- team game statistics
+- season records
+- rankings
 
 Postseason data is handled using the actual postseason weeks returned by the upstream data source rather than assuming one fixed week range.
 
-Known data limitation
+### Known data limitation
 
 A small number of completed games may not have detailed team-game statistics available from the imported statistics endpoint. FourthDown AI keeps the valid game result and final score rather than inventing missing statistics.
 
-💻 Local Development
+---
 
-Prerequisites
+## 💻 Local Development
+
+### Prerequisites
 
 Install:
 
-Git
+- Git
+- Docker Desktop
+- Java 21+
+- Maven
+- Node.js / npm
+- Python 3
 
-Docker Desktop
+### 1. Clone
 
-Java 21+
-
-Maven
-
-Node.js / npm
-
-Python 3
-
-1. Clone
-
+```bash
 git clone https://github.com/XavierM20/fourthdown-ai.git
 cd fourthdown-ai
+```
 
-2. Create local environment configuration
+### 2. Create local environment configuration
 
+```bash
 cp .env.example .env.local
+```
 
 Then set your local values:
 
+```env
 CFBD_API_KEY=replace_with_your_cfbd_api_key
 
 BACKEND_PORT=8080
@@ -442,78 +332,87 @@ JPA_FORMAT_SQL=false
 
 HOST=0.0.0.0
 RELOAD=false
+```
 
-Never commit .env.local. The repository only contains safe example environment files.
+> Never commit `.env.local`. The repository only contains safe example environment files.
 
-3. Frontend environment
+### 3. Frontend environment
 
 Create:
 
+```text
 frontend/.env.development
+```
 
 with:
 
+```env
 VITE_API_URL=http://localhost:8080/api/v1
+```
 
-4. Install frontend dependencies
+### 4. Install frontend dependencies
 
+```bash
 cd frontend
 npm install
 cd ..
+```
 
-5. Create the Python environment
+### 5. Create the Python environment
 
+```bash
 cd ml
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cd ..
+```
 
-6. Start the full stack
+### 6. Start the full stack
 
+```bash
 chmod +x start-dev.sh
 ./start-dev.sh
+```
 
-Service
+| Service | Local address |
+|---|---|
+| Frontend | `http://localhost:5173` |
+| Spring Boot | `http://localhost:8080` |
+| FastAPI | `http://localhost:8000` |
+| PostgreSQL | `localhost:5432` |
 
-Local address
+Press `Ctrl+C` to stop Spring Boot, FastAPI, and Vite. PostgreSQL remains running in Docker.
 
-Frontend
+---
 
-http://localhost:5173
+## ❤️ Health Checks
 
-Spring Boot
+### Spring Boot
 
-http://localhost:8080
-
-FastAPI
-
-http://localhost:8000
-
-PostgreSQL
-
-localhost:5432
-
-Press Ctrl+C to stop Spring Boot, FastAPI, and Vite. PostgreSQL remains running in Docker.
-
-❤️ Health Checks
-
-Spring Boot
-
+```bash
 curl http://localhost:8080/actuator/health
+```
 
 Expected:
 
+```json
 {"status":"UP"}
+```
 
-FastAPI
+### FastAPI
 
+```bash
 curl http://localhost:8000/health
+```
 
-🔌 API Overview
+---
+
+## 🔌 API Overview
 
 Representative endpoints:
 
+```text
 GET  /api/v1/teams
 GET  /api/v1/teams/{id}
 
@@ -531,27 +430,28 @@ GET  /api/v1/predictions/game/{gameId}
 
 GET  /api/v1/ml/model
 GET  /api/v1/ml/score-model
+```
 
 CFBD integration and data-import endpoints are also exposed through the Spring Boot API.
 
-🔐 Environment & Security
+---
 
-CFBD credentials stay on the backend.
+## 🔐 Environment & Security
 
-.env.local is excluded from Git.
+- CFBD credentials stay on the backend.
+- `.env.local` is excluded from Git.
+- `VITE_*` values are public browser-build variables and must not contain secrets.
+- Production CORS is controlled with `FRONTEND_ORIGIN`.
+- PostgreSQL credentials are provided through environment variables.
+- Spring Boot communicates with FastAPI server-to-server.
 
-VITE_* values are public browser-build variables and must not contain secrets.
+---
 
-Production CORS is controlled with FRONTEND_ORIGIN.
-
-PostgreSQL credentials are provided through environment variables.
-
-Spring Boot communicates with FastAPI server-to-server.
-
-🚀 Production Deployment
+## 🚀 Production Deployment
 
 The production architecture is designed around separate services:
 
+```text
 Public React Frontend
         │
         ▼
@@ -560,91 +460,75 @@ Public Spring Boot API
         ├──────────────► Managed PostgreSQL
         │
         └──────────────► FastAPI ML Service
+```
 
-The deployment target for this project is Railway.
+The deployment target for this project is **Railway**.
 
 Deployment configuration will use:
 
-managed PostgreSQL
+- managed PostgreSQL
+- environment-based credentials
+- service-to-service ML communication
+- production CORS
+- GitHub-connected automatic deployments
 
-environment-based credentials
+---
 
-service-to-service ML communication
+## 🧪 Frontend Production Build
 
-production CORS
-
-GitHub-connected automatic deployments
-
-🧪 Frontend Production Build
-
+```bash
 cd frontend
 npm run build
+```
 
 Major application routes use lazy loading/code splitting to reduce the size of the initial production JavaScript bundle.
 
-📸 Screenshots
+---
+
+## 📸 Screenshots
 
 Real application screenshots will be added here after the final production UI/deployment pass.
 
 Recommended captures:
 
-Dashboard
+- Dashboard
+- Rankings
+- Team Details
+- Team Comparison
+- Matchup Prediction
 
-Rankings
+> Using real application screenshots here is preferable to mockups because it gives reviewers an immediate view of the actual product.
 
-Team Details
+---
 
-Team Comparison
+## 🗺 Roadmap
 
-Matchup Prediction
+- [x] FBS and FCS team import
+- [x] Historical game import
+- [x] Detailed team-game statistics
+- [x] Bowl and playoff support
+- [x] Team analytics
+- [x] Team comparison
+- [x] AP / CFP / FCS rankings
+- [x] Weekly ranking history
+- [x] Winner prediction model
+- [x] Score prediction model
+- [x] FastAPI inference service
+- [x] React route-level code splitting
+- [x] Environment-based configuration
+- [x] One-command local startup
+- [x] GitHub repository
+- [ ] Railway production deployment
+- [ ] Production database initialization
+- [ ] Public application URL
+- [ ] Real application screenshots
+- [ ] CI/CD validation
 
-Using real application screenshots here is preferable to mockups because it gives reviewers an immediate view of the actual product.
+---
 
-🗺 Roadmap
+## 👤 Author
 
-FBS and FCS team import
-
-Historical game import
-
-Detailed team-game statistics
-
-Bowl and playoff support
-
-Team analytics
-
-Team comparison
-
-AP / CFP / FCS rankings
-
-Weekly ranking history
-
-Winner prediction model
-
-Score prediction model
-
-FastAPI inference service
-
-React route-level code splitting
-
-Environment-based configuration
-
-One-command local startup
-
-GitHub repository
-
-Railway production deployment
-
-Production database initialization
-
-Public application URL
-
-Real application screenshots
-
-CI/CD validation
-
-👤 Author
-
-Xavier Mathews
+**Xavier Mathews**
 
 Computer Science / Software Engineering
 
