@@ -31,6 +31,104 @@ type SeasonType =
   | "regular"
   | "postseason";
 
+
+
+// =========================================================
+// RELEVANT WEEK
+// =========================================================
+
+function getRelevantWeek(
+  games: Game[],
+  season: number | null
+): number | null {
+
+  if (season === null) {
+    return null;
+  }
+
+  const regularGames =
+    games.filter(
+      (game) =>
+        game.season === season &&
+        normalizeSeasonType(
+          game.seasonType
+        ) === "regular"
+    );
+
+  const availableWeeks =
+    Array.from(
+      new Set(
+        regularGames
+          .map(
+            (game) =>
+              game.week
+          )
+          .filter(
+            (
+              week
+            ): week is number =>
+              week !== null &&
+              week !== undefined
+          )
+      )
+    ).sort(
+      (a, b) =>
+        a - b
+    );
+
+  if (
+    availableWeeks.length === 0
+  ) {
+    return null;
+  }
+
+  const now =
+    new Date();
+
+  const futureGames =
+    regularGames
+      .filter(
+        (game) => {
+
+          const date =
+            new Date(
+              game.gameDate
+            );
+
+          return (
+            !Number.isNaN(
+              date.getTime()
+            ) &&
+            date >= now
+          );
+        }
+      )
+      .sort(
+        (a, b) =>
+          new Date(
+            a.gameDate
+          ).getTime() -
+          new Date(
+            b.gameDate
+          ).getTime()
+      );
+
+  if (
+    futureGames.length > 0
+  ) {
+    return (
+      futureGames[0].week ??
+      availableWeeks[
+        availableWeeks.length - 1
+      ]
+    );
+  }
+
+  return availableWeeks[
+    availableWeeks.length - 1
+  ];
+}
+
 // =========================================================
 // GAMES PAGE
 // =========================================================
@@ -113,6 +211,50 @@ export default function Games() {
           data
         );
 
+        const availableSeasons =
+          Array.from(
+            new Set(
+              data
+                .map(
+                  (game) =>
+                    game.season
+                )
+                .filter(
+                  (
+                    season
+                  ): season is number =>
+                    season !== null &&
+                    season !== undefined
+                )
+            )
+          ).sort(
+            (a, b) =>
+              b - a
+          );
+
+        const currentYear =
+          new Date()
+            .getFullYear();
+
+        const defaultSeason =
+          availableSeasons.includes(
+            currentYear
+          )
+            ? currentYear
+            : availableSeasons[0] ??
+              null;
+
+        setSelectedSeason(
+          defaultSeason
+        );
+
+        setSelectedWeek(
+          getRelevantWeek(
+            data,
+            defaultSeason
+          )
+        );
+
       } catch (err) {
 
         console.error(
@@ -167,45 +309,6 @@ export default function Games() {
         );
 
     }, [games]);
-
-  // =======================================================
-  // DEFAULT SEASON
-  // =======================================================
-
-  useEffect(() => {
-
-    if (
-      selectedSeason !== null ||
-      seasons.length === 0
-    ) {
-      return;
-    }
-
-    const currentYear =
-      new Date()
-        .getFullYear();
-
-    if (
-      seasons.includes(
-        currentYear
-      )
-    ) {
-
-      setSelectedSeason(
-        currentYear
-      );
-
-    } else {
-
-      setSelectedSeason(
-        seasons[0]
-      );
-    }
-
-  }, [
-    seasons,
-    selectedSeason,
-  ]);
 
   // =======================================================
   // GAMES FOR SELECTED SEASON
@@ -304,98 +407,6 @@ export default function Games() {
     }, [
       regularSeasonGames,
     ]);
-
-  // =======================================================
-  // AUTOMATIC CURRENT / RELEVANT WEEK
-  // =======================================================
-
-  useEffect(() => {
-
-    if (
-      selectedSeasonType !==
-      "regular"
-    ) {
-      return;
-    }
-
-    if (
-      regularSeasonGames.length ===
-      0
-    ) {
-      return;
-    }
-
-    if (
-      selectedWeek !== null &&
-      weeks.includes(
-        selectedWeek
-      )
-    ) {
-      return;
-    }
-
-    const now =
-      new Date();
-
-    const futureGames =
-      regularSeasonGames
-        .filter(
-          (game) => {
-
-            const date =
-              new Date(
-                game.gameDate
-              );
-
-            return (
-              !Number.isNaN(
-                date.getTime()
-              ) &&
-              date >= now
-            );
-          }
-        )
-        .sort(
-          (a, b) =>
-            new Date(
-              a.gameDate
-            ).getTime() -
-            new Date(
-              b.gameDate
-            ).getTime()
-        );
-
-    if (
-      futureGames.length >
-      0
-    ) {
-
-      setSelectedWeek(
-        futureGames[0].week
-      );
-
-      return;
-    }
-
-    if (
-      weeks.length >
-      0
-    ) {
-
-      setSelectedWeek(
-        weeks[
-          weeks.length - 1
-        ]
-      );
-    }
-
-  }, [
-    selectedSeason,
-    selectedSeasonType,
-    selectedWeek,
-    regularSeasonGames,
-    weeks,
-  ]);
 
   // =======================================================
   // ACTIVE SEASON TYPE GAMES
@@ -666,7 +677,10 @@ export default function Games() {
     );
 
     setSelectedWeek(
-      null
+      getRelevantWeek(
+        games,
+        season
+      )
     );
 
     clearFilters();
@@ -692,7 +706,10 @@ export default function Games() {
     ) {
 
       setSelectedWeek(
-        null
+        getRelevantWeek(
+          games,
+          selectedSeason
+        )
       );
     }
   }
