@@ -25,9 +25,9 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - name: Build backend
+      - name: Test and build backend
         working-directory: backend
-        run: mvn clean package -DskipTests
+        run: mvn clean test package
 
   frontend:
     name: Frontend Build
