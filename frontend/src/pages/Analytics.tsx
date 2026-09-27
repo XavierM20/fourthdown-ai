@@ -1,11 +1,29 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { Search } from "lucide-react";
 
 import { getGames } from "../api/games";
 import { getStatsByGame } from "../api/stats";
 
 import type { Game } from "../api/games";
 import type { TeamGameStats } from "../api/stats";
+
+function getWeekBounds(date: Date) {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() - start.getDay());
+
+  const end = new Date(start);
+  end.setDate(end.getDate() + 7);
+
+  return { start, end };
+}
+
+function formatGameLabel(game: Game) {
+  return `${game.awayTeam.name} at ${game.homeTeam.name} - ${new Date(
+    game.gameDate
+  ).toLocaleDateString()}`;
+}
 
 export default function Analytics() {
   const [games, setGames] = useState<Game[]>([]);
@@ -18,17 +36,41 @@ export default function Analytics() {
   const [loadingStats, setLoadingStats] = useState(false);
 
   const [error, setError] = useState("");
+  const [gameSearch, setGameSearch] = useState("");
 
   useEffect(() => {
     async function loadGames() {
       try {
         const data = await getGames();
+        const now = new Date();
+        const { start, end } = getWeekBounds(now);
 
-        const sortedGames = [...data].sort(
-          (a, b) =>
-            new Date(b.gameDate).getTime() -
-            new Date(a.gameDate).getTime()
-        );
+        const sortedGames = [...data].sort((a, b) => {
+          const aDate = new Date(a.gameDate);
+          const bDate = new Date(b.gameDate);
+
+          const aThisWeek = aDate >= start && aDate < end;
+          const bThisWeek = bDate >= start && bDate < end;
+
+          if (aThisWeek && !bThisWeek) return -1;
+          if (!aThisWeek && bThisWeek) return 1;
+
+          const aFuture = aDate >= end;
+          const bFuture = bDate >= end;
+
+          if (aFuture && !bFuture) return -1;
+          if (!aFuture && bFuture) return 1;
+
+          if (aThisWeek && bThisWeek) {
+            return aDate.getTime() - bDate.getTime();
+          }
+
+          if (aFuture && bFuture) {
+            return aDate.getTime() - bDate.getTime();
+          }
+
+          return bDate.getTime() - aDate.getTime();
+        });
 
         setGames(sortedGames);
 
@@ -67,6 +109,52 @@ export default function Analytics() {
 
     loadStats();
   }, [selectedGameId]);
+
+  const groupedGames = useMemo(() => {
+    const now = new Date();
+    const { start, end } = getWeekBounds(now);
+
+    const query = gameSearch.trim().toLowerCase();
+
+    const filtered = games.filter((game) => {
+      if (!query) {
+        return true;
+      }
+
+      const searchableText = [
+        game.homeTeam.name,
+        game.awayTeam.name,
+        new Date(game.gameDate).toLocaleDateString(),
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return searchableText.includes(query);
+    });
+
+    const thisWeek: Game[] = [];
+    const upcoming: Game[] = [];
+    const previous: Game[] = [];
+
+    filtered.forEach((game) => {
+      const gameDate = new Date(game.gameDate);
+
+      if (gameDate >= start && gameDate < end) {
+        thisWeek.push(game);
+      } else if (gameDate >= end) {
+        upcoming.push(game);
+      } else {
+        previous.push(game);
+      }
+    });
+
+    return {
+      thisWeek,
+      upcoming,
+      previous,
+      total: filtered.length,
+    };
+  }, [games, gameSearch]);
 
   if (loadingGames) {
     return (
@@ -186,12 +274,46 @@ export default function Analytics() {
           </h1>
 
           <p className="mt-2 text-slate-400">
-            Select a real game and compare its recorded
-            team statistics.
+            This week's games are shown first. Search by team
+            to quickly find another matchup.
           </p>
         </div>
 
         <div className="mb-8 rounded-xl border border-slate-800 bg-slate-900 p-6">
+          <div className="mb-5">
+            <label
+              htmlFor="game-search"
+              className="mb-2 block text-sm font-medium text-slate-300"
+            >
+              Search Games
+            </label>
+
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+
+              <input
+                id="game-search"
+                type="text"
+                value={gameSearch}
+                onChange={(event) =>
+                  setGameSearch(event.target.value)
+                }
+                placeholder="Search Alabama, Georgia, Texas..."
+                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-3 pl-10 pr-4 text-white outline-none transition placeholder:text-slate-600 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div className="mb-3 flex flex-wrap gap-2 text-xs">
+            <span className="rounded-full bg-blue-500/10 px-3 py-1 text-blue-300">
+              This week: {groupedGames.thisWeek.length}
+            </span>
+
+            <span className="rounded-full bg-slate-800 px-3 py-1 text-slate-400">
+              Matching games: {groupedGames.total}
+            </span>
+          </div>
+
           <label className="mb-2 block text-sm font-medium text-slate-300">
             Select Game
           </label>
@@ -205,19 +327,51 @@ export default function Analytics() {
             }
             className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-blue-500"
           >
-            {games.map((game) => (
-              <option
-                key={game.id}
-                value={game.id}
-              >
-                {game.awayTeam.name} at{" "}
-                {game.homeTeam.name} -{" "}
-                {new Date(
-                  game.gameDate
-                ).toLocaleDateString()}
-              </option>
-            ))}
+            {groupedGames.thisWeek.length > 0 && (
+              <optgroup label="This Week">
+                {groupedGames.thisWeek.map((game) => (
+                  <option
+                    key={game.id}
+                    value={game.id}
+                  >
+                    {formatGameLabel(game)}
+                  </option>
+                ))}
+              </optgroup>
+            )}
+
+            {groupedGames.upcoming.length > 0 && (
+              <optgroup label="Upcoming">
+                {groupedGames.upcoming.map((game) => (
+                  <option
+                    key={game.id}
+                    value={game.id}
+                  >
+                    {formatGameLabel(game)}
+                  </option>
+                ))}
+              </optgroup>
+            )}
+
+            {groupedGames.previous.length > 0 && (
+              <optgroup label="Previous Games">
+                {groupedGames.previous.map((game) => (
+                  <option
+                    key={game.id}
+                    value={game.id}
+                  >
+                    {formatGameLabel(game)}
+                  </option>
+                ))}
+              </optgroup>
+            )}
           </select>
+
+          {groupedGames.total === 0 && (
+            <p className="mt-3 text-sm text-amber-400">
+              No games match your search.
+            </p>
+          )}
         </div>
 
         {loadingStats && (

@@ -26,11 +26,17 @@ export default function CompareTeams() {
       try {
         const data = await getTeams();
 
-        setTeams(data);
+        const sortedTeams = [...data].sort((a, b) =>
+          a.name.localeCompare(b.name, undefined, {
+            sensitivity: "base",
+          })
+        );
 
-        if (data.length >= 2) {
-          setTeamOneId(data[0].id);
-          setTeamTwoId(data[1].id);
+        setTeams(sortedTeams);
+
+        if (sortedTeams.length >= 2) {
+          setTeamOneId(sortedTeams[0].id);
+          setTeamTwoId(sortedTeams[1].id);
         }
       } catch (err) {
         setError("Unable to load teams.");

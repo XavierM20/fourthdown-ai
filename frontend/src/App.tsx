@@ -222,6 +222,7 @@ function Sidebar() {
       to: "/analytics",
       label: "Analytics",
       icon: BarChart3,
+      end: true,
     },
 
     {
