@@ -11,8 +11,31 @@ on:
 
 jobs:
   backend:
-    name: Backend Build
+    name: Backend Test and Build
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: fourthdown
+          POSTGRES_USER: fourthdown
+          POSTGRES_PASSWORD: fourthdown_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U fourthdown -d fourthdown"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      CFBD_API_KEY: test-key
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/fourthdown
+      SPRING_DATASOURCE_USERNAME: fourthdown
+      SPRING_DATASOURCE_PASSWORD: fourthdown_dev
+      ML_BASE_URL: http://localhost:8000
+      FRONTEND_ORIGIN: http://localhost:5173
 
     steps:
       - name: Checkout repository
@@ -30,7 +53,7 @@ jobs:
         run: mvn clean test package
 
   frontend:
-    name: Frontend Build
+    name: Frontend Lint and Build
     runs-on: ubuntu-latest
 
     steps:
