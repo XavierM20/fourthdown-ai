@@ -13,7 +13,9 @@ import com.fourthdown.ai.repository.TeamRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class DataImportService {
@@ -175,6 +177,43 @@ public class DataImportService {
                         normalizedClassification
                 );
 
+        /*
+         * A classification-filtered schedule can still contain
+         * opponents from another classification. For example,
+         * an FBS team may play an FCS or lower-division opponent.
+         *
+         * Never classify a team from the schedule being imported.
+         * Instead, load CFBD's team metadata for the season and use
+         * that team's own classification as the authoritative value.
+         *
+         * Teams that are not present in CFBD's FBS/FCS metadata are
+         * stored as "other" so they cannot leak into the FBS tab.
+         */
+        Map<Long, String> teamClassifications =
+                new HashMap<>();
+
+        List<CfbdTeamResponse> seasonTeams =
+                cfbdClient.getTeams(year);
+
+        if (seasonTeams != null) {
+            for (CfbdTeamResponse seasonTeam : seasonTeams) {
+
+                if (seasonTeam.getId() == null) {
+                    continue;
+                }
+
+                String teamClassification =
+                        normalizeTeamClassification(
+                                seasonTeam.getClassification()
+                        );
+
+                teamClassifications.put(
+                        seasonTeam.getId(),
+                        teamClassification
+                );
+            }
+        }
+
         int gamesCreated = 0;
         int gamesUpdated = 0;
         int teamsCreated = 0;
@@ -193,7 +232,10 @@ public class DataImportService {
                             cfbdGame.getHomeId(),
                             cfbdGame.getHomeTeam(),
                             cfbdGame.getHomeConference(),
-                            normalizedClassification
+                            teamClassifications.getOrDefault(
+                                    cfbdGame.getHomeId(),
+                                    "other"
+                            )
                     );
 
             TeamResult awayResult =
@@ -201,7 +243,10 @@ public class DataImportService {
                             cfbdGame.getAwayId(),
                             cfbdGame.getAwayTeam(),
                             cfbdGame.getAwayConference(),
-                            normalizedClassification
+                            teamClassifications.getOrDefault(
+                                    cfbdGame.getAwayId(),
+                                    "other"
+                            )
                     );
 
             Team homeTeam =
@@ -812,16 +857,16 @@ public class DataImportService {
             }
 
             /*
-             * Do not blindly overwrite classification.
-             *
-             * Cross-classification games can exist,
-             * such as an FBS team playing an FCS team.
+             * classification now comes from CFBD team metadata,
+             * not from the schedule classification. It is safe to
+             * refresh the stored value here and it also repairs
+             * teams that were previously misclassified.
              */
-            if (existing.getClassification() == null) {
-                existing.setClassification(
-                        classification
-                );
-            }
+            existing.setClassification(
+                    normalizeTeamClassification(
+                            classification
+                    )
+            );
 
             teamRepository.save(
                     existing
@@ -851,11 +896,11 @@ public class DataImportService {
                 );
             }
 
-            if (existing.getClassification() == null) {
-                existing.setClassification(
-                        classification
-                );
-            }
+            existing.setClassification(
+                    normalizeTeamClassification(
+                            classification
+                    )
+            );
 
             teamRepository.save(
                     existing
@@ -884,7 +929,9 @@ public class DataImportService {
         );
 
         team.setClassification(
-                classification
+                normalizeTeamClassification(
+                        classification
+                )
         );
 
         Team savedTeam =
@@ -896,6 +943,32 @@ public class DataImportService {
                 savedTeam,
                 true
         );
+    }
+
+    // =========================================================
+    // TEAM CLASSIFICATION
+    // =========================================================
+
+    private String normalizeTeamClassification(
+            String classification
+    ) {
+
+        if (classification == null ||
+                classification.isBlank()) {
+            return "other";
+        }
+
+        String normalized =
+                classification
+                        .trim()
+                        .toLowerCase();
+
+        if (normalized.equals("fbs") ||
+                normalized.equals("fcs")) {
+            return normalized;
+        }
+
+        return "other";
     }
 
     // =========================================================
