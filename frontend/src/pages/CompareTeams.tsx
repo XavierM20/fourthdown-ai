@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { BarChart3 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { BarChart3, Search } from "lucide-react";
 
 import { getTeams } from "../api/teams";
 import { compareTeams } from "../api/stats";
@@ -12,6 +12,9 @@ export default function CompareTeams() {
 
   const [teamOneId, setTeamOneId] = useState<number | null>(null);
   const [teamTwoId, setTeamTwoId] = useState<number | null>(null);
+
+  const [teamOneSearch, setTeamOneSearch] = useState("");
+  const [teamTwoSearch, setTeamTwoSearch] = useState("");
 
   const [comparison, setComparison] =
     useState<TeamComparison | null>(null);
@@ -47,6 +50,50 @@ export default function CompareTeams() {
 
     loadTeams();
   }, []);
+
+  const filteredTeamOne = useMemo(() => {
+    const query = teamOneSearch.trim().toLowerCase();
+
+    if (!query) {
+      return teams;
+    }
+
+    return teams.filter((team) =>
+      [
+        team.name,
+        team.abbreviation,
+        team.conference,
+        team.city,
+        team.state,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(query)
+    );
+  }, [teams, teamOneSearch]);
+
+  const filteredTeamTwo = useMemo(() => {
+    const query = teamTwoSearch.trim().toLowerCase();
+
+    if (!query) {
+      return teams;
+    }
+
+    return teams.filter((team) =>
+      [
+        team.name,
+        team.abbreviation,
+        team.conference,
+        team.city,
+        team.state,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(query)
+    );
+  }, [teams, teamTwoSearch]);
 
   async function handleCompare() {
     if (!teamOneId || !teamTwoId) {
@@ -107,7 +154,7 @@ export default function CompareTeams() {
           </h1>
 
           <p className="mt-2 text-slate-400">
-            Compare team performance using recorded game statistics.
+            Search for two teams and compare their recorded performance.
           </p>
         </div>
 
@@ -118,6 +165,20 @@ export default function CompareTeams() {
                 Team One
               </label>
 
+              <div className="relative mb-3">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+
+                <input
+                  type="text"
+                  value={teamOneSearch}
+                  onChange={(event) =>
+                    setTeamOneSearch(event.target.value)
+                  }
+                  placeholder="Search team..."
+                  className="w-full rounded-lg border border-slate-700 bg-slate-950 py-3 pl-10 pr-4 text-white outline-none transition placeholder:text-slate-600 focus:border-blue-500"
+                />
+              </div>
+
               <select
                 value={teamOneId ?? ""}
                 onChange={(event) =>
@@ -125,7 +186,7 @@ export default function CompareTeams() {
                 }
                 className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               >
-                {teams.map((team) => (
+                {filteredTeamOne.map((team) => (
                   <option
                     key={team.id}
                     value={team.id}
@@ -134,12 +195,32 @@ export default function CompareTeams() {
                   </option>
                 ))}
               </select>
+
+              {filteredTeamOne.length === 0 && (
+                <p className="mt-2 text-sm text-amber-400">
+                  No teams match that search.
+                </p>
+              )}
             </div>
 
             <div>
               <label className="mb-2 block text-sm font-medium text-slate-300">
                 Team Two
               </label>
+
+              <div className="relative mb-3">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+
+                <input
+                  type="text"
+                  value={teamTwoSearch}
+                  onChange={(event) =>
+                    setTeamTwoSearch(event.target.value)
+                  }
+                  placeholder="Search team..."
+                  className="w-full rounded-lg border border-slate-700 bg-slate-950 py-3 pl-10 pr-4 text-white outline-none transition placeholder:text-slate-600 focus:border-blue-500"
+                />
+              </div>
 
               <select
                 value={teamTwoId ?? ""}
@@ -148,7 +229,7 @@ export default function CompareTeams() {
                 }
                 className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               >
-                {teams.map((team) => (
+                {filteredTeamTwo.map((team) => (
                   <option
                     key={team.id}
                     value={team.id}
@@ -157,6 +238,12 @@ export default function CompareTeams() {
                   </option>
                 ))}
               </select>
+
+              {filteredTeamTwo.length === 0 && (
+                <p className="mt-2 text-sm text-amber-400">
+                  No teams match that search.
+                </p>
+              )}
             </div>
 
             <button
@@ -186,7 +273,7 @@ export default function CompareTeams() {
             </h2>
 
             <p className="mt-2 text-sm text-slate-500">
-              Choose teams above and click Compare Teams to view
+              Search for the teams above and click Compare Teams to view
               their analytics.
             </p>
           </div>

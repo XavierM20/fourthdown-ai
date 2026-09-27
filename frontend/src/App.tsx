@@ -41,10 +41,6 @@ const TeamDetails = lazy(
   () => import("./pages/TeamDetails")
 );
 
-const Analytics = lazy(
-  () => import("./pages/Analytics")
-);
-
 const CompareTeams = lazy(
   () => import("./pages/CompareTeams")
 );
@@ -142,13 +138,6 @@ export default function App() {
               />
 
               <Route
-                path="/analytics"
-                element={
-                  <Analytics />
-                }
-              />
-
-              <Route
                 path="/analytics/compare"
                 element={
                   <CompareTeams />
@@ -216,13 +205,6 @@ function Sidebar() {
       to: "/rankings",
       label: "Rankings",
       icon: Trophy,
-    },
-
-    {
-      to: "/analytics",
-      label: "Analytics",
-      icon: BarChart3,
-      end: true,
     },
 
     {
