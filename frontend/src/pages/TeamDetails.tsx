@@ -437,19 +437,7 @@ export default function TeamDetails() {
 
           <div className="relative flex flex-col gap-6 p-8 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-6">
-              {team.logoUrl ? (
-                <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl bg-white/95 p-3 shadow-xl">
-                  <img
-                    src={team.logoUrl}
-                    alt={`${team.name} logo`}
-                    className="max-h-full max-w-full object-contain"
-                  />
-                </div>
-              ) : (
-                <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl bg-black/30 text-4xl font-bold">
-                  {team.name.charAt(0)}
-                </div>
-              )}
+              <TeamLogo team={team} />
 
               <div>
                 <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -914,6 +902,55 @@ export default function TeamDetails() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function TeamLogo({
+  team,
+}: {
+  team: Team;
+}) {
+  const [imageFailed, setImageFailed] =
+    useState(false);
+
+  const initials =
+    team.abbreviation?.trim() ||
+    team.name
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => word[0])
+      .join("")
+      .slice(0, 3)
+      .toUpperCase();
+
+  const logoUrl =
+    team.logoUrl ?? undefined;
+
+  const showImage =
+    Boolean(logoUrl) &&
+    !imageFailed;
+
+  if (showImage) {
+    return (
+      <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl bg-white/95 p-3 shadow-xl">
+        <img
+          src={logoUrl}
+          alt={`${team.name} logo`}
+          className="max-h-full max-w-full object-contain"
+          onError={() =>
+            setImageFailed(true)
+          }
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-black/30 px-3 text-center shadow-xl backdrop-blur">
+      <span className="text-3xl font-bold tracking-wide text-white">
+        {initials || "—"}
+      </span>
     </div>
   );
 }
