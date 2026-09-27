@@ -77,7 +77,7 @@ export default function Analytics() {
         if (sortedGames.length > 0) {
           setSelectedGameId(sortedGames[0].id);
         }
-      } catch (err) {
+      } catch{
         setError("Unable to load games.");
       } finally {
         setLoadingGames(false);
@@ -100,7 +100,7 @@ export default function Analytics() {
         const data = await getStatsByGame(selectedGameId);
 
         setStats(data);
-      } catch (err) {
+      } catch{
         setError("Unable to load game analytics.");
       } finally {
         setLoadingStats(false);

@@ -18,7 +18,7 @@ export default function Teams() {
       try {
         const data = await getTeams();
         setTeams(data);
-      } catch (err) {
+      } catch {
         setError("Unable to load teams.");
       } finally {
         setLoading(false);

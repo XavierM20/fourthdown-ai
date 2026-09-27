@@ -349,11 +349,13 @@ export default function Rankings() {
   // RANKINGS
   // =======================================================
 
-  const rankings =
+  const rankings = useMemo(
+  () =>
     rankingData
       ?.rankings
-      ?.slice(0, 25) ??
-    [];
+      ?.slice(0, 25) ?? [],
+  [rankingData]
+);
 
   // =======================================================
   // CONFERENCES

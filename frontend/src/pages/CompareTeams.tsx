@@ -41,7 +41,7 @@ export default function CompareTeams() {
           setTeamOneId(sortedTeams[0].id);
           setTeamTwoId(sortedTeams[1].id);
         }
-      } catch (err) {
+      } catch {
         setError("Unable to load teams.");
       } finally {
         setLoadingTeams(false);
