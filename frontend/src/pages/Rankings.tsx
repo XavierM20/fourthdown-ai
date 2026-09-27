@@ -242,18 +242,6 @@ export default function Rankings() {
               return currentWeek;
             }
 
-            if (
-              Number.isFinite(
-                urlWeek
-              ) &&
-              urlWeek > 0 &&
-              sortedWeeks.includes(
-                urlWeek
-              )
-            ) {
-              return urlWeek;
-            }
-
             return (
               sortedWeeks[
                 sortedWeeks.length - 1
