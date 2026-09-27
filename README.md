@@ -469,41 +469,11 @@ curl http://localhost:8000/health
 
 ---
 
-## Completed Milestones
-
-- [x] FBS and FCS team import
-- [x] Historical game import
-- [x] Detailed team-game statistics
-- [x] Bowl and playoff support
-- [x] Team analytics
-- [x] Team comparison
-- [x] AP / CFP / FCS rankings
-- [x] Weekly rankings by season
-- [x] Weekly ranking history
-- [x] Week-specific records in historical rankings
-- [x] Winner prediction model
-- [x] Score prediction model
-- [x] FastAPI inference service
-- [x] Environment-based configuration
-- [x] One-command local startup
-- [x] Railway production deployment
-- [x] Managed production database
-- [x] Public application URL
-- [x] Real application screenshots
-
-### Future improvements
-
-- [ ] Automated CI validation for frontend/backend builds
-- [ ] Additional model experimentation and calibration
-- [ ] Expanded historical seasons
-- [ ] Richer matchup explanation visualizations
-
----
 
 ## Author
 
 **Xavier Mathews**
 
-Computer Science / Software Engineering
+Software Engineer
 
 FourthDown AI was built as a portfolio project focused on full-stack engineering, backend systems, sports-data pipelines, production deployment, and applied machine learning.
