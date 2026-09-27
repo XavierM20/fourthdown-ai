@@ -81,7 +81,8 @@ public class PollRankingsService {
 
     public PollRankingsResponse getRankings(
             int season,
-            String classification
+            String classification,
+            Integer week
     ) {
 
         String normalizedClassification =
@@ -96,7 +97,8 @@ public class PollRankingsService {
         String cacheKey =
                 buildCacheKey(
                         season,
-                        normalizedClassification
+                        normalizedClassification,
+                        week
                 );
 
         CachedRanking cached =
@@ -118,13 +120,14 @@ public class PollRankingsService {
         }
 
         /*
-         * Otherwise request the newest poll information
-         * from CFBD.
+         * Request either the selected week or, when week is null,
+         * the newest available poll for the season.
          */
         PollRankingsResponse response =
                 loadRankings(
                         season,
-                        normalizedClassification
+                        normalizedClassification,
+                        week
                 );
 
         cache.put(
@@ -136,6 +139,55 @@ public class PollRankingsService {
         );
 
         return response;
+    }
+
+    // =========================================================
+    // GET AVAILABLE POLL WEEKS
+    // =========================================================
+
+    public List<Integer> getAvailableWeeks(
+            int season,
+            String classification
+    ) {
+
+        String normalizedClassification =
+                classification
+                        .trim()
+                        .toLowerCase();
+
+        validateClassification(
+                normalizedClassification
+        );
+
+        List<CfbdRankingResponse> weeks =
+                cfbdClient.getRankings(
+                        season
+                );
+
+        if (
+                weeks == null ||
+                        weeks.isEmpty()
+        ) {
+
+            return List.of();
+        }
+
+        return weeks.stream()
+                .filter(week ->
+                        week != null &&
+                                week.getWeek() != null &&
+                                week.getPolls() != null &&
+                                selectPollForWeek(
+                                        week,
+                                        normalizedClassification
+                                ) != null
+                )
+                .map(
+                        CfbdRankingResponse::getWeek
+                )
+                .distinct()
+                .sorted()
+                .toList();
     }
 
     // =========================================================
@@ -473,7 +525,8 @@ public class PollRankingsService {
 
     private PollRankingsResponse loadRankings(
             int season,
-            String classification
+            String classification,
+            Integer requestedWeek
     ) {
 
         List<CfbdRankingResponse> weeks =
@@ -492,13 +545,53 @@ public class PollRankingsService {
             );
         }
 
-        PollSnapshot snapshot;
+        PollSnapshot snapshot =
+                null;
 
         // =====================================================
-        // FBS
+        // SPECIFIC WEEK
         // =====================================================
 
-        if (
+        if (requestedWeek != null) {
+
+            for (CfbdRankingResponse week : weeks) {
+
+                if (
+                        week == null ||
+                                week.getWeek() == null ||
+                                week.getWeek() != requestedWeek
+                ) {
+                    continue;
+                }
+
+                CfbdRankingResponse.Poll selectedPoll =
+                        selectPollForWeek(
+                                week,
+                                classification
+                        );
+
+                if (
+                        selectedPoll != null &&
+                                selectedPoll.getRanks() != null &&
+                                !selectedPoll.getRanks().isEmpty()
+                ) {
+
+                    snapshot =
+                            new PollSnapshot(
+                                    requestedWeek,
+                                    selectedPoll
+                            );
+
+                    break;
+                }
+            }
+        }
+
+        // =====================================================
+        // LATEST AVAILABLE WEEK
+        // =====================================================
+
+        else if (
                 "fbs".equals(
                         classification
                 )
@@ -528,13 +621,7 @@ public class PollRankingsService {
                         );
             }
 
-        }
-
-        // =====================================================
-        // FCS
-        // =====================================================
-
-        else {
+        } else {
 
             snapshot =
                     findLatestPoll(
@@ -580,7 +667,8 @@ public class PollRankingsService {
                 standingsService
                         .getStandings(
                                 season,
-                                classification
+                                classification,
+                                snapshot.week()
                         );
 
         Map<Long, TeamStandingResponse> standingByTeamId =
@@ -904,12 +992,19 @@ public class PollRankingsService {
 
     private String buildCacheKey(
             int season,
-            String classification
+            String classification,
+            Integer week
     ) {
 
         return season +
                 ":" +
-                classification;
+                classification +
+                ":" +
+                (
+                        week == null
+                                ? "latest"
+                                : week
+                );
     }
 
     private boolean isExpired(
@@ -973,16 +1068,20 @@ public class PollRankingsService {
             String classification
     ) {
 
-        String cacheKey =
-                buildCacheKey(
-                        season,
+        String rankingPrefix =
+                season +
+                        ":" +
                         classification
-                                .toLowerCase()
-                );
+                                .toLowerCase() +
+                        ":";
 
-        cache.remove(
-                cacheKey
-        );
+        cache.keySet()
+                .removeIf(
+                        key ->
+                                key.startsWith(
+                                        rankingPrefix
+                                )
+                );
 
         String historyPrefix =
                 season +

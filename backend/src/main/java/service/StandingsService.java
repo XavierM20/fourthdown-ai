@@ -33,6 +33,19 @@ public class StandingsService {
             String classification
     ) {
 
+        return getStandings(
+                season,
+                classification,
+                null
+        );
+    }
+
+    public List<TeamStandingResponse> getStandings(
+            int season,
+            String classification,
+            Integer rankingWeek
+    ) {
+
         String normalizedClassification =
                 classification
                         .trim()
@@ -73,6 +86,52 @@ public class StandingsService {
                             game.getAwayScore() == null
             ) {
                 continue;
+            }
+
+            /*
+             * CFBD poll "Week N" represents the poll entering Week N.
+             *
+             * Therefore the record shown beside that poll should only
+             * include games completed BEFORE Week N. Example:
+             *
+             * Week 1 poll -> preseason / 0-0 record
+             * Week 7 poll -> record through Week 6
+             *
+             * When rankingWeek is null, keep the original behavior and
+             * use every completed game in the season.
+             */
+            if (rankingWeek != null) {
+
+                /*
+                 * Weekly polls are based on regular-season results
+                 * available at that point in the season.
+                 *
+                 * CFBD postseason week numbers restart, so a bowl or
+                 * playoff game can have a small week number such as 1
+                 * or 2. If we only compare the numeric week, those
+                 * postseason games would incorrectly be counted in a
+                 * Week 15 poll from the regular season.
+                 */
+                if (
+                        game.getSeasonType() != null &&
+                                !game.getSeasonType()
+                                        .equalsIgnoreCase(
+                                                "regular"
+                                        )
+                ) {
+                    continue;
+                }
+
+                /*
+                 * Poll Week N represents the rankings entering Week N,
+                 * so only games from earlier regular-season weeks count.
+                 */
+                if (
+                        game.getWeek() == null ||
+                                game.getWeek() >= rankingWeek
+                ) {
+                    continue;
+                }
             }
 
             Team homeTeam =

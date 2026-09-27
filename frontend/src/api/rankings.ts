@@ -47,7 +47,8 @@ const API_URL = (
 
 export async function getRankings(
   season: number,
-  classification: "fbs" | "fcs"
+  classification: "fbs" | "fcs",
+  week?: number
 ): Promise<PollRankingsResponse> {
   const params =
     new URLSearchParams({
@@ -55,6 +56,13 @@ export async function getRankings(
         season.toString(),
       classification,
     });
+
+  if (week !== undefined) {
+    params.set(
+      "week",
+      week.toString()
+    );
+  }
 
   const response =
     await fetch(
@@ -64,6 +72,31 @@ export async function getRankings(
   if (!response.ok) {
     throw new Error(
       "Failed to fetch rankings"
+    );
+  }
+
+  return response.json();
+}
+
+export async function getRankingWeeks(
+  season: number,
+  classification: "fbs" | "fcs"
+): Promise<number[]> {
+  const params =
+    new URLSearchParams({
+      season:
+        season.toString(),
+      classification,
+    });
+
+  const response =
+    await fetch(
+      `${API_URL}/rankings/weeks?${params.toString()}`
+    );
+
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch ranking weeks"
     );
   }
 

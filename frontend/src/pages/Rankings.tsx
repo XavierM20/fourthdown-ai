@@ -15,6 +15,7 @@ import {
 } from "react-router-dom";
 
 import {
+  getRankingWeeks,
   getRankings,
 } from "../api/rankings";
 
@@ -58,6 +59,13 @@ export default function Rankings() {
       "classification"
     );
 
+  const urlWeek =
+    Number(
+      searchParams.get(
+        "week"
+      )
+    );
+
   const initialSeason =
     Number.isFinite(
       urlSeason
@@ -92,6 +100,23 @@ export default function Rankings() {
     useState<Classification>(
       initialClassification
     );
+
+  const [
+    selectedWeek,
+    setSelectedWeek,
+  ] =
+    useState<number | null>(
+      Number.isFinite(urlWeek) &&
+      urlWeek > 0
+        ? urlWeek
+        : null
+    );
+
+  const [
+    availableWeeks,
+    setAvailableWeeks,
+  ] =
+    useState<number[]>([]);
 
   const [
     rankingData,
@@ -148,13 +173,20 @@ export default function Rankings() {
 
   useEffect(() => {
 
-    setSearchParams(
-      {
-        season:
-          selectedSeason.toString(),
+    const params: Record<string, string> = {
+      season:
+        selectedSeason.toString(),
 
-        classification,
-      },
+      classification,
+    };
+
+    if (selectedWeek !== null) {
+      params.week =
+        selectedWeek.toString();
+    }
+
+    setSearchParams(
+      params,
       {
         replace: true,
       }
@@ -163,7 +195,105 @@ export default function Rankings() {
   }, [
     selectedSeason,
     classification,
+    selectedWeek,
     setSearchParams,
+  ]);
+
+  // =======================================================
+  // LOAD AVAILABLE WEEKS
+  // =======================================================
+
+  useEffect(() => {
+
+    async function loadWeeks() {
+
+      try {
+
+        setLoading(
+          true
+        );
+
+        setError("");
+
+        const weeks =
+          await getRankingWeeks(
+            selectedSeason,
+            classification
+          );
+
+        const sortedWeeks =
+          [...weeks].sort(
+            (a, b) => a - b
+          );
+
+        setAvailableWeeks(
+          sortedWeeks
+        );
+
+        setSelectedWeek(
+          (currentWeek) => {
+
+            if (
+              currentWeek !== null &&
+              sortedWeeks.includes(
+                currentWeek
+              )
+            ) {
+              return currentWeek;
+            }
+
+            if (
+              Number.isFinite(
+                urlWeek
+              ) &&
+              urlWeek > 0 &&
+              sortedWeeks.includes(
+                urlWeek
+              )
+            ) {
+              return urlWeek;
+            }
+
+            return (
+              sortedWeeks[
+                sortedWeeks.length - 1
+              ] ?? null
+            );
+          }
+        );
+
+      } catch (err) {
+
+        console.error(
+          "Unable to load ranking weeks:",
+          err
+        );
+
+        setAvailableWeeks(
+          []
+        );
+
+        setSelectedWeek(
+          null
+        );
+
+        setError(
+          "Unable to load ranking weeks."
+        );
+
+      } finally {
+
+        setLoading(
+          false
+        );
+      }
+    }
+
+    loadWeeks();
+
+  }, [
+    selectedSeason,
+    classification,
   ]);
 
   // =======================================================
@@ -173,6 +303,13 @@ export default function Rankings() {
   useEffect(() => {
 
     async function loadRankings() {
+
+      if (selectedWeek === null) {
+        setRankingData(
+          null
+        );
+        return;
+      }
 
       try {
 
@@ -185,7 +322,8 @@ export default function Rankings() {
         const data =
           await getRankings(
             selectedSeason,
-            classification
+            classification,
+            selectedWeek
           );
 
         setRankingData(
@@ -216,6 +354,7 @@ export default function Rankings() {
   }, [
     selectedSeason,
     classification,
+    selectedWeek,
   ]);
 
   // =======================================================
@@ -319,7 +458,11 @@ export default function Rankings() {
   // =======================================================
 
   const rankingReturnPath =
-    `/rankings?season=${selectedSeason}&classification=${classification}`;
+    `/rankings?season=${selectedSeason}&classification=${classification}${
+      selectedWeek !== null
+        ? `&week=${selectedWeek}`
+        : ""
+    }`;
 
   // =======================================================
   // CHANGE CLASSIFICATION
@@ -331,6 +474,10 @@ export default function Rankings() {
 
     setClassification(
       value
+    );
+
+    setSelectedWeek(
+      null
     );
 
     setSearch("");
@@ -412,60 +559,138 @@ export default function Rankings() {
 
             </div>
 
-            {/* SEASON */}
+            {/* SEASON / WEEK */}
 
-            <div>
+            <div className="flex flex-wrap gap-3">
 
-              <label
-                htmlFor="ranking-season"
-                className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500"
-              >
-                Season
-              </label>
+              <div>
 
-              <select
-                id="ranking-season"
-                value={
-                  selectedSeason
-                }
-                onChange={
-                  (event) => {
+                <label
+                  htmlFor="ranking-season"
+                  className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500"
+                >
+                  Season
+                </label>
 
-                    setSelectedSeason(
-                      Number(
-                        event.target
-                          .value
-                      )
-                    );
-
-                    setSearch("");
-
-                    setSelectedConference(
-                      "ALL"
-                    );
+                <select
+                  id="ranking-season"
+                  value={
+                    selectedSeason
                   }
-                }
-                className="rounded-lg border border-slate-700 bg-slate-900 px-5 py-2.5 font-semibold text-white outline-none transition focus:border-blue-500"
-              >
+                  onChange={
+                    (event) => {
 
-                {seasonOptions.map(
-                  (season) => (
+                      setSelectedSeason(
+                        Number(
+                          event.target
+                            .value
+                        )
+                      );
 
-                    <option
-                      key={
-                        season
-                      }
-                      value={
-                        season
-                      }
-                    >
-                      {season} Season
+                      setSelectedWeek(
+                        null
+                      );
+
+                      setSearch("");
+
+                      setSelectedConference(
+                        "ALL"
+                      );
+                    }
+                  }
+                  className="rounded-lg border border-slate-700 bg-slate-900 px-5 py-2.5 font-semibold text-white outline-none transition focus:border-blue-500"
+                >
+
+                  {seasonOptions.map(
+                    (season) => (
+
+                      <option
+                        key={
+                          season
+                        }
+                        value={
+                          season
+                        }
+                      >
+                        {season} Season
+                      </option>
+
+                    )
+                  )}
+
+                </select>
+
+              </div>
+
+              <div>
+
+                <label
+                  htmlFor="ranking-week"
+                  className="mb-2 block text-xs font-semibold uppercase tracking-wider text-slate-500"
+                >
+                  Week
+                </label>
+
+                <select
+                  id="ranking-week"
+                  value={
+                    selectedWeek ?? ""
+                  }
+                  onChange={
+                    (event) => {
+
+                      setSelectedWeek(
+                        Number(
+                          event.target
+                            .value
+                        )
+                      );
+
+                      setSearch("");
+
+                      setSelectedConference(
+                        "ALL"
+                      );
+                    }
+                  }
+                  disabled={
+                    availableWeeks.length ===
+                    0
+                  }
+                  className="rounded-lg border border-slate-700 bg-slate-900 px-5 py-2.5 font-semibold text-white outline-none transition focus:border-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+
+                  {availableWeeks.length ===
+                  0 ? (
+
+                    <option value="">
+                      No weeks available
                     </option>
 
-                  )
-                )}
+                  ) : (
 
-              </select>
+                    availableWeeks.map(
+                      (week) => (
+
+                        <option
+                          key={
+                            week
+                          }
+                          value={
+                            week
+                          }
+                        >
+                          Week {week}
+                        </option>
+
+                      )
+                    )
+
+                  )}
+
+                </select>
+
+              </div>
 
             </div>
 
@@ -560,7 +785,7 @@ export default function Rankings() {
           <div className="mb-6 rounded-2xl border border-slate-800 bg-slate-900 p-5">
 
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              Current Ranking
+              Selected Ranking
             </p>
 
             <div className="mt-2 flex flex-wrap items-center gap-3">

@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/rankings")
 public class StandingsController {
@@ -31,12 +33,38 @@ public class StandingsController {
             @RequestParam(
                     defaultValue = "fbs"
             )
-            String classification
+            String classification,
+
+            @RequestParam(
+                    required = false
+            )
+            Integer week
 
     ) {
 
         return pollRankingsService
                 .getRankings(
+                        season,
+                        classification,
+                        week
+                );
+    }
+
+    @GetMapping("/weeks")
+    public List<Integer> getAvailableWeeks(
+
+            @RequestParam
+            int season,
+
+            @RequestParam(
+                    defaultValue = "fbs"
+            )
+            String classification
+
+    ) {
+
+        return pollRankingsService
+                .getAvailableWeeks(
                         season,
                         classification
                 );
@@ -65,5 +93,4 @@ public class StandingsController {
                         teamId
                 );
     }
-
 }
