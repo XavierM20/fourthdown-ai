@@ -377,7 +377,19 @@ Production uses managed PostgreSQL, environment-based credentials, GitHub-connec
 - **Backend health:** https://backend-production-0139.up.railway.app/actuator/health
 
 ---
+## Continuous Integration
 
+GitHub Actions validates the project on every push and pull request by:
+
+- starting PostgreSQL 16 for backend integration testing
+- running the backend test suite
+- building the Spring Boot backend
+- linting the React frontend
+- building the production frontend bundle
+
+The workflow helps catch build, test, and code-quality issues before changes reach production.
+
+---
 ## Local Development
 
 ### Prerequisites
