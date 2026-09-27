@@ -25,6 +25,12 @@
   <img src="https://img.shields.io/badge/Deployed-Railway-0B0D0E?logo=railway&logoColor=white" alt="Railway" />
 </p>
 
+<p align="center">
+  <a href="https://github.com/XavierM20/fourthdown-ai/actions/workflows/ci.yml">
+    <img src="https://github.com/XavierM20/fourthdown-ai/actions/workflows/ci.yml/badge.svg" alt="CI" />
+  </a>
+</p>
+
 ---
 
 ## Overview
