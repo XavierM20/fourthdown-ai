@@ -177,18 +177,7 @@ public class DataImportService {
                         normalizedClassification
                 );
 
-        /*
-         * A classification-filtered schedule can still contain
-         * opponents from another classification. For example,
-         * an FBS team may play an FCS or lower-division opponent.
-         *
-         * Never classify a team from the schedule being imported.
-         * Instead, load CFBD's team metadata for the season and use
-         * that team's own classification as the authoritative value.
-         *
-         * Teams that are not present in CFBD's FBS/FCS metadata are
-         * stored as "other" so they cannot leak into the FBS tab.
-         */
+      
         Map<Long, String> teamClassifications =
                 new HashMap<>();
 
@@ -276,10 +265,7 @@ public class DataImportService {
             boolean existingGame =
                     game != null;
 
-            /*
-             * This catches manually inserted games
-             * that existed before CFBD IDs were added.
-             */
+            
             if (game == null) {
 
                 game = gameRepository
@@ -347,8 +333,8 @@ public class DataImportService {
 
 
             // -------------------------------------------------
-// GAME / BOWL / PLAYOFF NAME
-// -------------------------------------------------
+            // GAME / BOWL / PLAYOFF NAME
+           // -------------------------------------------------
 
             String gameName =
                     cfbdGame.getNotes();
@@ -384,7 +370,7 @@ public class DataImportService {
                 }
 
                 /*
-                 * Keep the playoff round separately so the
+                 * Keeps the playoff round separately so the
                  * frontend can show:
                  *
                  * Rose Bowl
@@ -664,9 +650,6 @@ public class DataImportService {
     // Postseason covers:
     // - FBS conference championships / bowls / CFP
     // - FCS playoff games
-    //
-    // Re-running is safe because TeamGameStats is matched by
-    // game ID + team ID and updated instead of duplicated.
     // =========================================================
 
     public SeasonStatsImportResult importSeasonStats(
@@ -684,8 +667,6 @@ public class DataImportService {
 
         // ---------------------------------------------------------
         // REGULAR SEASON
-        //
-        // Some seasons include Week 16, so do not stop at 15.
         // ---------------------------------------------------------
 
         for (int week = 1; week <= 16; week++) {
@@ -718,11 +699,6 @@ public class DataImportService {
 
         // ---------------------------------------------------------
         // POSTSEASON
-        //
-        // CFBD requires week, team, or conference for /games/teams
-        // when filtering by year. We first load the postseason
-        // schedule, discover the actual postseason week numbers, and
-        // then request team stats for each of those weeks.
         // ---------------------------------------------------------
 
         List<CfbdGameResponse> postseasonSchedule =
