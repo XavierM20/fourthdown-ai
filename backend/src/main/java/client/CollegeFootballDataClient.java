@@ -252,9 +252,6 @@ public class CollegeFootballDataClient {
     // regular
     // postseason
     // both
-    //
-    // week may be null. This lets FourthDown AI request every
-    // postseason game without assuming postseason week numbers.
     // =========================================================
 
     public List<CfbdTeamGameStatsResponse> getTeamGameStats(
