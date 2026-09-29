@@ -29,8 +29,7 @@ MODELS_DIR.mkdir(
     exist_ok=True,
 )
 
-# Keep the current production score model untouched until the
-# candidate has been reviewed.
+
 PRODUCTION_MODEL_PATH = (
     MODELS_DIR
     / "fourthdown_score_model.joblib"
@@ -404,9 +403,6 @@ print(
 # Evaluate:
 # Train = 2023 + 2024
 # Test  = 2025
-#
-# After model selection, refit the chosen algorithm on
-# 2023 + 2024 + 2025 for the deployment candidate.
 # ============================================================
 
 train_df = df[
