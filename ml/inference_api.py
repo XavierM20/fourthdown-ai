@@ -471,11 +471,6 @@ def predict(
 
         # ====================================================
         # KEEP SCORE CONSISTENT WITH WINNER CLASSIFIER
-        #
-        # The Logistic Regression classifier is our primary
-        # winner model because it was explicitly trained and
-        # evaluated for winner classification.
-        #
         # The score model is responsible for score magnitude.
         # ====================================================
 
@@ -553,8 +548,6 @@ def predict(
 # Local defaults:
 #   HOST=0.0.0.0
 #   PORT=8000
-#
-# Production platforms can inject PORT automatically.
 # ============================================================
 
 if __name__ == "__main__":
