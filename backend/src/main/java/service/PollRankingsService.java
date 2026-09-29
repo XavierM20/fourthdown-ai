@@ -27,13 +27,7 @@ public class PollRankingsService {
     // CACHE SETTINGS
     // =========================================================
 
-    /*
-     * Rankings normally change once per week.
-     *
-     * A six-hour cache prevents unnecessary CFBD calls while
-     * still allowing new rankings to appear in the app on the
-     * same day they are published.
-     */
+    
     private static final Duration CACHE_DURATION =
             Duration.ofHours(6);
 
@@ -700,14 +694,7 @@ public class PollRankingsService {
                     List.of();
         }
 
-        /*
-         * IMPORTANT:
-         *
-         * The API rank controls ordering.
-         *
-         * We do not re-sort teams based on our own
-         * win percentage or scoring metrics.
-         */
+        
         pollRanks.stream()
 
                 .filter(rank ->
@@ -827,10 +814,7 @@ public class PollRankingsService {
         Team team =
                 null;
 
-        /*
-         * CFBD ID is preferred because it is more
-         * reliable than comparing school names.
-         */
+       
         if (
                 rank.getTeamId() != null
         ) {
