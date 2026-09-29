@@ -39,7 +39,10 @@ const API_URL = (
 export async function getGames(): Promise<Game[]> {
   const response =
     await fetch(
-      `${API_URL}/games`
+      `${API_URL}/games`,
+      {
+        cache: "no-store",
+      }
     );
 
   if (!response.ok) {
@@ -56,7 +59,10 @@ export async function getGameById(
 ): Promise<Game> {
   const response =
     await fetch(
-      `${API_URL}/games/${id}`
+      `${API_URL}/games/${id}`,
+      {
+        cache: "no-store",
+      }
     );
 
   if (!response.ok) {

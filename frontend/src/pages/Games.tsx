@@ -200,12 +200,19 @@ export default function Games() {
 
   useEffect(() => {
 
-    async function loadGames() {
+    let cancelled =
+      false;
+
+    async function loadInitialGames() {
 
       try {
 
         const data =
           await getGames();
+
+        if (cancelled) {
+          return;
+        }
 
         setGames(
           data
@@ -255,7 +262,13 @@ export default function Games() {
           )
         );
 
+        setError("");
+
       } catch (err) {
+
+        if (cancelled) {
+          return;
+        }
 
         console.error(
           "Unable to load games:",
@@ -268,11 +281,74 @@ export default function Games() {
 
       } finally {
 
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     }
 
-    loadGames();
+    async function refreshGames() {
+
+      try {
+
+        const data =
+          await getGames();
+
+        if (cancelled) {
+          return;
+        }
+
+        /*
+         * Background refreshes only replace the game data.
+         * They do NOT reset the season/week/filter the user is
+         * currently viewing.
+         */
+        setGames(
+          data
+        );
+
+        setError("");
+
+      } catch (err) {
+
+        console.error(
+          "Unable to refresh games:",
+          err
+        );
+      }
+    }
+
+    loadInitialGames();
+
+    const refreshInterval =
+      window.setInterval(
+        refreshGames,
+        120000
+      );
+
+    function handleWindowFocus() {
+      refreshGames();
+    }
+
+    window.addEventListener(
+      "focus",
+      handleWindowFocus
+    );
+
+    return () => {
+
+      cancelled =
+        true;
+
+      window.clearInterval(
+        refreshInterval
+      );
+
+      window.removeEventListener(
+        "focus",
+        handleWindowFocus
+      );
+    };
 
   }, []);
 

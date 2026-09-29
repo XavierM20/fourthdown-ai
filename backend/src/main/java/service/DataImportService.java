@@ -581,6 +581,78 @@ public class DataImportService {
         );
     }
 
+
+    // =========================================================
+    // SINGLE WEEK TEAM STATS IMPORT
+    //
+    // Used by the automatic sync coordinator after scheduled
+    // games begin finishing. This avoids re-importing an entire
+    // season every time a game goes final.
+    //
+    // seasonType:
+    // regular
+    // postseason
+    // =========================================================
+
+    public SeasonStatsImportResult importWeekStats(
+            int year,
+            int week,
+            String classification,
+            String seasonType
+    ) {
+
+        String normalizedClassification =
+                classification
+                        .trim()
+                        .toLowerCase();
+
+        String normalizedSeasonType =
+                seasonType == null ||
+                        seasonType.isBlank()
+                        ? "regular"
+                        : seasonType
+                                .trim()
+                                .toLowerCase();
+
+        if (!normalizedClassification.equals("fbs") &&
+                !normalizedClassification.equals("fcs")) {
+
+            throw new IllegalArgumentException(
+                    "Classification must be fbs or fcs"
+            );
+        }
+
+        if (!normalizedSeasonType.equals("regular") &&
+                !normalizedSeasonType.equals("postseason")) {
+
+            throw new IllegalArgumentException(
+                    "Season type must be regular or postseason"
+            );
+        }
+
+        List<CfbdTeamGameStatsResponse> games =
+                cfbdClient.getTeamGameStats(
+                        year,
+                        week,
+                        normalizedClassification,
+                        normalizedSeasonType
+                );
+
+        StatsBatchResult result =
+                importStatsGames(
+                        games
+                );
+
+        return new SeasonStatsImportResult(
+                year,
+                normalizedClassification.toUpperCase(),
+                result.gamesReceived(),
+                result.statsCreated(),
+                result.statsUpdated(),
+                result.gamesSkipped()
+        );
+    }
+
     // =========================================================
     // SEASON TEAM STATS IMPORT
     // Supports FBS and FCS
