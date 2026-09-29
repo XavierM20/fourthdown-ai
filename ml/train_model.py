@@ -30,8 +30,7 @@ MODELS_DIR.mkdir(
     exist_ok=True,
 )
 
-# Keep the current production model untouched until the
-# candidate has been reviewed.
+
 PRODUCTION_MODEL_PATH = (
     MODELS_DIR /
     "fourthdown_model.joblib"
@@ -565,9 +564,6 @@ if existing_metadata:
 
 # ============================================================
 # REFIT CHOSEN ALGORITHM ON ALL COMPLETED HISTORICAL DATA
-#
-# This does NOT change the holdout metrics above. Those metrics
-# remain based only on 2023-2024 -> 2025 evaluation.
 # ============================================================
 
 print(
@@ -592,9 +588,6 @@ deployment_model.fit(
 
 # ============================================================
 # SAVE CANDIDATE ONLY
-#
-# Do not overwrite the current production model until the new
-# holdout results have been reviewed.
 # ============================================================
 
 joblib.dump(
