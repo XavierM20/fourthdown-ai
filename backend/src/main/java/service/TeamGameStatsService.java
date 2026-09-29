@@ -41,7 +41,7 @@ public class TeamGameStatsService {
         return statsRepository.findAll();
     }
 
-    // Alias kept in case an older controller uses this name.
+    
     public List<TeamGameStats> getAll() {
 
         return getAllStats();
