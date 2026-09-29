@@ -92,13 +92,6 @@ public class TrainingDataService {
 
             // =================================================
             // FEATURE GENERATION
-            //
-            // This now includes:
-            //
-            // - current-season features
-            // - early-season prior-year fallback
-            // - kickoff-time cutoff
-            // - opponent-strength metrics
             // =================================================
 
             MatchupFeatureSnapshot matchup =
@@ -118,12 +111,9 @@ public class TrainingDataService {
 
             // =================================================
             // MINIMUM HISTORY REQUIREMENT
-            //
-            // gamesPlayed may include usable prior-season
-            // history during the early-season fallback period.
             // =================================================
 
-            if (home.gamesPlayed() <
+        if (home.gamesPlayed() <
                     minPriorGames ||
                     away.gamesPlayed() <
                             minPriorGames) {
@@ -300,8 +290,6 @@ public class TrainingDataService {
 
             // =================================================
             // MODEL DIFFERENCE FEATURES
-            //
-            // These are the actual values used by Python.
             // =================================================
 
             example.setPointsDifference(
@@ -346,9 +334,6 @@ public class TrainingDataService {
 
             // =================================================
             // ACTUAL RESULT
-            //
-            // These values are only labels/evaluation targets.
-            // They are NOT available to the model before kickoff.
             // =================================================
 
             example.setHomeScore(
