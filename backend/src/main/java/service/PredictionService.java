@@ -310,12 +310,6 @@ public class PredictionService {
 
         // =====================================================
         // SCORE MODEL OUTPUT
-        //
-        // These values now come directly from Ridge Regression
-        // through FastAPI.
-        //
-        // Spring no longer computes projected scores using
-        // handwritten formulas.
         // =====================================================
 
         int projectedHomeScore =
@@ -415,10 +409,7 @@ public class PredictionService {
                 projectedAwayScore
         );
 
-        // =====================================================
-        // EXPLANATION
-        // =====================================================
-
+      
         response.setExplanation(
                 buildExplanation(
                         homeTeam.getName(),
@@ -431,13 +422,7 @@ public class PredictionService {
         return response;
     }
 
-    // =========================================================
-    // EXPLANATION
-    //
-    // This still uses the same pregame feature snapshots
-    // used by the ML models.
-    // =========================================================
-
+    
     private List<String> buildExplanation(
             String homeTeamName,
             String awayTeamName,
