@@ -99,6 +99,14 @@ Team pages combine season records, conference information, current ranking, week
 
 The game browser supports regular-season and postseason views, week navigation, conference filtering, status filtering, bowl names, playoff rounds, venues, and final scores.
 
+### Compare Teams
+
+<p align="center">
+  <img src="docs/screenshots/compare-teams.png" alt="FourthDown AI team comparison" width="100%" />
+</p>
+
+Compare two college football teams using recorded performance metrics including scoring, total offense, passing, rushing, turnovers, and other team analytics.
+
 ### Matchup Prediction
 
 <p align="center">
