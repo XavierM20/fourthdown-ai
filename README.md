@@ -356,9 +356,9 @@ Schedule-Aware Sync Coordinator
                     │
                     ▼
           Analytics / Games / Predictions
-
+```
 ---
-## Representative API Endpoints
+### Representative API Endpoints
 
 ```text
 GET  /api/v1/teams
