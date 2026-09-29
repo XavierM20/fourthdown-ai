@@ -27,11 +27,7 @@ public class DataRefreshScheduler {
     private static final int BEFORE_KICKOFF_HOURS = 2;
     private static final int AFTER_KICKOFF_HOURS = 6;
 
-    /*
-     * Even when no game is close to kickoff, refresh the season schedule
-     * periodically so postponed games, kickoff changes, venues, etc.
-     * are picked up automatically.
-     */
+    
     private static final long IDLE_SCHEDULE_REFRESH_MINUTES = 120;
 
     /*
@@ -204,7 +200,6 @@ public class DataRefreshScheduler {
     // DAILY TEAM METADATA
     //
     // Logos, conference, mascot, colors, location, etc.
-    // This is intentionally separate from game-day polling.
     // =========================================================
 
     @Scheduled(
@@ -272,7 +267,6 @@ public class DataRefreshScheduler {
     ) {
 
         /*
-         * importSeason is idempotent in FourthDown AI:
          * existing CFBD games are updated instead of duplicated.
          *
          * This refreshes:
@@ -298,9 +292,6 @@ public class DataRefreshScheduler {
 
     // =========================================================
     // REFRESH RELEVANT WEEK STATS
-    //
-    // Once at least one game in an active game window is completed,
-    // refresh that exact week instead of importing all 16 weeks.
     // =========================================================
 
     private void refreshRelevantWeekStats(
@@ -309,15 +300,7 @@ public class DataRefreshScheduler {
             LocalDateTime now
     ) {
 
-        /*
-         * Look for ANY completed game in the active season that is
-         * missing one or both TeamGameStats rows.
-         *
-         * This is intentionally not limited to the current kickoff
-         * window. It lets FourthDown AI repair older games that have
-         * a final score/status but whose detailed stats were not
-         * imported yet.
-         */
+        
         Map<WeekKey, Boolean>
                 weeksMissingStats =
                 new HashMap<>();
