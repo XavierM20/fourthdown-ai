@@ -741,10 +741,7 @@ public class FeatureEngineeringService {
             double priorWeight
     ) {
 
-        /*
-         * Keep this behavior because minPriorGames can use
-         * prior-season history during the early season.
-         */
+       
         int availableGames =
                 currentGames +
                         priorGames;
@@ -970,9 +967,6 @@ public class FeatureEngineeringService {
 
     // =========================================================
     // ACTUAL DATABASE LOAD
-    //
-    // This should happen only once per season while the
-    // application process is running.
     // =========================================================
 
     private Map<Long, List<TeamGameStats>> loadSeasonStats(
@@ -1113,12 +1107,7 @@ public class FeatureEngineeringService {
         }
 
 
-        /*
-         * Strictly BEFORE kickoff.
-         *
-         * This prevents the game being predicted from
-         * accidentally appearing in its own feature data.
-         */
+       
         return stat.getGame()
                 .getGameDate()
                 .isBefore(
