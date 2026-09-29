@@ -322,7 +322,42 @@ Team classification is derived from team metadata rather than assuming that ever
 A small number of completed games may not have detailed team-game statistics available from the upstream statistics endpoint. FourthDown AI preserves the valid game result instead of fabricating missing metrics.
 
 ---
+### Automatic Data Synchronization
 
+FourthDown AI uses a schedule-aware background synchronization pipeline so production data stays current without manual imports.
+
+The Spring Boot backend continuously coordinates updates based on the college football schedule:
+
+- the stored schedule is checked every 5 minutes
+- games near kickoff are refreshed more aggressively
+- scores and game status are updated automatically from CFBD
+- completed games are checked for missing team-game statistics
+- missing statistics are automatically backfilled for the affected season and week
+- team analytics and comparison data update from the refreshed statistics
+- team metadata is refreshed periodically
+- rankings use a 6-hour cache because poll rankings typically update on a slower weekly cycle
+- the Games frontend periodically refetches backend data and refreshes when the browser window regains focus
+
+The synchronization process is designed to reduce unnecessary external API calls while keeping game-day information current.
+
+```text
+Stored Schedule
+      │
+      ▼
+Schedule-Aware Sync Coordinator
+      │
+      ├──► Refresh Game Status / Scores
+      │
+      ├──► Detect Completed Games
+      │
+      ├──► Backfill Missing Weekly Statistics
+      │
+      └──► Update PostgreSQL
+                    │
+                    ▼
+          Analytics / Games / Predictions
+
+---
 ## Representative API Endpoints
 
 ```text
