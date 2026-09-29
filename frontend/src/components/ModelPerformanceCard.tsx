@@ -54,9 +54,9 @@ export default function ModelPerformanceCard({
   return (
     <div className="space-y-6">
 
-      {/* =====================================================
-          WINNER MODEL
-         ===================================================== */}
+      {// =====================================================
+       // WINNER MODEL
+       // ===================================================== */}
 
       {winnerMetadata && (
         <div className="rounded-2xl border border-blue-500/20 bg-gradient-to-br from-blue-500/10 to-slate-900 p-6">
@@ -177,9 +177,9 @@ export default function ModelPerformanceCard({
         </div>
       )}
 
-      {/* =====================================================
-          SCORE MODEL
-         ===================================================== */}
+      {// =====================================================
+       // SCORE MODEL
+       // ===================================================== */}
 
       {scoreMetadata && (
         <div className="rounded-2xl border border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-slate-900 p-6">
